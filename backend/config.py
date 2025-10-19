@@ -1,9 +1,9 @@
 # module that lets you interact with the operating system
 import os
-# load key-value pairs from a .env
+# for loading key-value pairs from a .env
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from .env
 loaded = load_dotenv()
 
 class Config:
