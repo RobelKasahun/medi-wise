@@ -1,1 +1,0 @@
-This directory is for MediWise pages [ Login, Registration, and so on ]
