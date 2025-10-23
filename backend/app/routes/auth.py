@@ -3,7 +3,7 @@ from app.models.chat import Chat
 from app.models.user import User
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, create_refresh_token, set_refresh_cookies, set_access_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, set_refresh_cookies, set_access_cookies, jwt_required, get_jwt_identity
 
 # create auth blueprint
 auth_blueprint = Blueprint('auth', __name__)
@@ -72,4 +72,14 @@ def login():
          # the given password with the password in the database does not match
         if not check_password_hash(user.password_hash, password):
             return jsonify({'error': 'Oops! That password doesn\'t match our records.'}), 401
+
+@auth_blueprint.route('/refresh', methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    new_access_token = create_access_token(identity=str(identity))
+    response = jsonify(access_token=new_access_token)
+    set_access_cookies(response, new_access_token)  # ✅ Set cookie again!
+    return response, 200
+    
     
