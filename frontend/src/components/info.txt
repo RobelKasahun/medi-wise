@@ -1,0 +1,1 @@
+For components [Navbar, Footer, and so on]
