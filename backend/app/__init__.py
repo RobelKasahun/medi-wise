@@ -43,8 +43,10 @@ def create_app():
     with app.app_context():
         # import blueprints
         from app.routes.auth import auth_blueprint
-        
+        from app.routes.prompt import prompt_blueprint
+
         # Register the blueprints with the app
         app.register_blueprint(auth_blueprint, url_prefix='/auth')
+        app.register_blueprint(prompt_blueprint, url_prefix='/')
         
     return app
