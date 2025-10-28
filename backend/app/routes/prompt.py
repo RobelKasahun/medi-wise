@@ -26,4 +26,4 @@ def prompt():
         db.session.add(chat)
         db.session.commit()
     
-    return jsonify(response.json()['results']), 200
+    return jsonify(len(response.json()['results'])), 200
