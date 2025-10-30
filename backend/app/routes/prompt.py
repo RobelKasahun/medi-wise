@@ -5,6 +5,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import requests
 
+
 prompt_blueprint = Blueprint('prompt', __name__)
 
 @prompt_blueprint.route('/prompt', methods=['GET', 'POST'])
