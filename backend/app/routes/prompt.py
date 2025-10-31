@@ -4,7 +4,7 @@ from app.models.user import User
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import requests
-
+import json
 
 prompt_blueprint = Blueprint('prompt', __name__)
 
@@ -20,6 +20,9 @@ def prompt():
     url = f'https://api.fda.gov/drug/label.json?search=openfda.brand_name:{user_prompt.lower()}&limit=1000'
     
     response = requests.get(url=url)
+    
+    with open("./app/data.json", mode="w") as file:
+        json.dump(response.json()['results'], file, indent=4)
     
     if not Chat.query.filter_by(user_id=logged_in_user, user_prompt=user_prompt):
         chat = Chat(user_id=logged_in_user, user_prompt=user_prompt, llm_response=llm_response)
