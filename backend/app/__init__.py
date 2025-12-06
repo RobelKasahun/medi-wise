@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from config import Config
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 # open database connection
 db = SQLAlchemy()
@@ -20,6 +21,17 @@ mail = Mail()
 
 def create_app():
     app = Flask(__name__)
+    
+    '''
+        it allows backend to accept requests from your frontend, 
+        even if they are on different domains/ports
+        
+        Allows your frontend (maybe running on localhost:3000) 
+        to talk to this Flask backend (usually on localhost:5000).
+    '''
+    # allows the front end to talk to the backend
+    # http://localhost:5173
+    CORS(app, supports_credentials=True, origins=["http://localhost:5173"])
     
     # load the configuration settings from the Config class
     '''

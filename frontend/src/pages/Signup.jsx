@@ -93,6 +93,7 @@ const Signup = () => {
         });
       } else {
         setApiError(result.error);
+        console.log(`Error: ${result.error}`)
       }
     } catch (err) {
       setApiError('An unexpected error occurred. Please try again.');

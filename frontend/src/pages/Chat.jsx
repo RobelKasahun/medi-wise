@@ -46,6 +46,8 @@ const Chat = () => {
 
     try {
       const response = await promptAPI.sendPrompt(userMessage);
+
+      console.log(`response: ${response}`)
       
       // Add AI response to chat
       setMessages((prev) => [
