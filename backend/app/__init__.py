@@ -40,6 +40,10 @@ def create_app():
     app.config.from_object(Config)
     app.config['DATABASE_URL'] = os.getenv('DATABASE_URL')
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+    app.config['JWT_TOKEN_LOCATION'] = ["cookies"]
+    app.config['JWT_COOKIE_SECURE'] = False     # only for local dev
+    app.config['JWT_COOKIE_SAMESITE'] = "None"  # required for cross-origin
+    app.config['JWT_COOKIE_CSRF_PROTECT'] = False
     
     # for Reset password instructions link TODO:
     

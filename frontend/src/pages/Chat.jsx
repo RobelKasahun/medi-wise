@@ -1,20 +1,20 @@
-import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { promptAPI } from '../utils/api';
-import Button from '../components/Button';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { promptAPI } from "../utils/api";
+import Button from "../components/Button";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Chat = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
   const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -23,23 +23,23 @@ const Chat = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim() || loading) {
       return;
     }
 
     const userMessage = inputValue.trim();
-    setInputValue('');
+    setInputValue("");
 
     // Add user message to chat
     setMessages((prev) => [
       ...prev,
-      { role: 'user', content: userMessage, timestamp: new Date() },
+      { role: "user", content: userMessage, timestamp: new Date() },
     ]);
 
     setLoading(true);
@@ -47,24 +47,28 @@ const Chat = () => {
     try {
       const response = await promptAPI.sendPrompt(userMessage);
 
-      console.log(`response: ${response}`)
-      
+      console.log(`response: ${response}`);
+
       // Add AI response to chat
       setMessages((prev) => [
         ...prev,
-        { 
-          role: 'assistant', 
-          content: response.llm_response || 'Response received from API', 
-          timestamp: new Date() 
+        {
+          role: "assistant",
+          content: response.llm_response || "Response received from API",
+          timestamp: new Date(),
         },
       ]);
     } catch (error) {
+      console.log(
+        "Sorry, there was an error processing your request. Please try again."
+      );
       // Add error message to chat
       setMessages((prev) => [
         ...prev,
         {
-          role: 'error',
-          content: 'Sorry, there was an error processing your request. Please try again.',
+          role: "error",
+          content:
+            "Sorry, there was an error processing your request. Please try again.",
           timestamp: new Date(),
         },
       ]);
@@ -74,7 +78,7 @@ const Chat = () => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
@@ -85,11 +89,7 @@ const Chat = () => {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
         <h1 className="text-xl font-bold text-gray-900">MediWise.AI</h1>
-        <Button
-          onClick={handleLogout}
-          variant="outline"
-          className="text-sm"
-        >
+        <Button onClick={handleLogout} variant="outline" className="text-sm">
           Logout
         </Button>
       </header>
@@ -118,8 +118,8 @@ const Chat = () => {
                 Welcome to MediWise.AI
               </h2>
               <p className="text-gray-600 max-w-md mx-auto">
-                Ask me anything about medications, side effects, dosages, and more. 
-                I'm here to help you understand your medicines better.
+                Ask me anything about medications, side effects, dosages, and
+                more. I'm here to help you understand your medicines better.
               </p>
             </div>
           ) : (
@@ -127,16 +127,16 @@ const Chat = () => {
               <div
                 key={index}
                 className={`flex ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                  message.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
                   className={`max-w-2xl rounded-2xl px-4 py-3 ${
-                    message.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : message.role === 'error'
-                      ? 'bg-red-50 text-red-900 border border-red-200'
-                      : 'bg-white text-gray-900 border border-gray-200'
+                    message.role === "user"
+                      ? "bg-blue-600 text-white"
+                      : message.role === "error"
+                      ? "bg-red-50 text-red-900 border border-red-200"
+                      : "bg-white text-gray-900 border border-gray-200"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{message.content}</p>
@@ -144,7 +144,7 @@ const Chat = () => {
               </div>
             ))
           )}
-          
+
           {loading && (
             <div className="flex justify-start">
               <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
@@ -152,7 +152,7 @@ const Chat = () => {
               </div>
             </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -170,8 +170,8 @@ const Chat = () => {
                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows="1"
                 style={{
-                  minHeight: '52px',
-                  maxHeight: '200px',
+                  minHeight: "52px",
+                  maxHeight: "200px",
                 }}
                 disabled={loading}
               />

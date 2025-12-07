@@ -63,6 +63,7 @@ const Login = () => {
       const result = await login(formData.email, formData.password);
       
       if (result.success) {
+        console.log(`result: ************** ${result} ****************`);
         navigate('/chat');
       } else {
         setApiError(result.error);
