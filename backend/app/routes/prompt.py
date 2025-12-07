@@ -10,6 +10,7 @@ import chromadb
 from chromadb.utils import embedding_functions
 from openai import OpenAI
 from dotenv import load_dotenv
+import os
 
 # load environment variables
 load_dotenv()
@@ -98,6 +99,10 @@ def prompt():
         db.session.commit()
     else:
         print('Chat exists...')
+        
+    # delete the text file
+    file = f'/Users/robelayelew/Desktop/medi-wise/backend/app/files/{user_prompt.lower()}.txt'
+    os.remove(file)
     
     return answer.content, 200
 
