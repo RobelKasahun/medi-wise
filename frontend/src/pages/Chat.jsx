@@ -49,18 +49,20 @@ const Chat = () => {
 
       console.log(`response: ${response}`);
 
+      // .llm_response || "Response received from API"
+
       // Add AI response to chat
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: response.llm_response || "Response received from API",
+          content: `${response}` || "Response received from API",
           timestamp: new Date(),
         },
       ]);
     } catch (error) {
       console.log(
-        "Sorry, there was an error processing your request. Please try again."
+        `Sorry, there was an error processing your request. Please try again.: ${error}`
       );
       // Add error message to chat
       setMessages((prev) => [
