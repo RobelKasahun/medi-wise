@@ -97,13 +97,10 @@ def prompt():
         chat = Chat(user_id=logged_in_user, user_prompt=question, llm_response=answer.content)
         db.session.add(chat)
         db.session.commit()
-    else:
-        print('Chat exists...')
         
     # delete the text file
     file = f'/Users/robelayelew/Desktop/medi-wise/backend/app/files/{user_prompt.lower()}.txt'
     os.remove(file)
-    
     return answer.content, 200
 
 
