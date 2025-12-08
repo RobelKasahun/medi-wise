@@ -60,9 +60,11 @@ def create_app():
         # import blueprints
         from app.routes.auth import auth_blueprint
         from app.routes.prompt import prompt_blueprint
+        from app.routes.conversation import conversation_blueprint
 
         # Register the blueprints with the app
         app.register_blueprint(auth_blueprint, url_prefix='/auth')
         app.register_blueprint(prompt_blueprint, url_prefix='/')
+        app.register_blueprint(conversation_blueprint, url_prefix='/')
         
     return app
