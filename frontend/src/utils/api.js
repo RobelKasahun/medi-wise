@@ -89,10 +89,39 @@ export const authAPI = {
 
 // Prompt API calls
 export const promptAPI = {
-  sendPrompt: async (userPrompt) => {
+  sendPrompt: async (userPrompt, conversationId = null) => {
     const response = await api.post(API_ENDPOINTS.PROMPT, {
       user_prompt: userPrompt,
+      conversation_id: conversationId,
     });
+    return response.data;
+  },
+};
+
+// Conversation API calls
+export const conversationAPI = {
+  getConversations: async () => {
+    const response = await api.get('/conversations');
+    return response.data;
+  },
+
+  getConversation: async (conversationId) => {
+    const response = await api.get(`/conversations/${conversationId}`);
+    return response.data;
+  },
+
+  createConversation: async (title) => {
+    const response = await api.post('/conversations', { title });
+    return response.data;
+  },
+
+  deleteConversation: async (conversationId) => {
+    const response = await api.delete(`/conversations/${conversationId}`);
+    return response.data;
+  },
+
+  updateConversationTitle: async (conversationId, title) => {
+    const response = await api.put(`/conversations/${conversationId}/title`, { title });
     return response.data;
   },
 };
