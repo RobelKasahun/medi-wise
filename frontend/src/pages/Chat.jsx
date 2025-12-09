@@ -273,7 +273,7 @@ const Chat = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask about a medication... (e.g., 'Tell me about Xarelto')"
+                  placeholder="Enter medication name (e.g., Xarelto)"
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   rows="1"
                   style={{
