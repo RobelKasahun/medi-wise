@@ -123,16 +123,25 @@ const Chat = () => {
         },
       ]);
     } catch (error) {
-      console.log(
-        `Sorry, there was an error processing your request. Please try again.: ${error}`
-      );
+      console.error("Error sending prompt:", error);
+      
+      // Extract the error message from the backend response
+      let errorMessage = "Sorry, there was an error processing your request. Please try again.";
+      
+      if (error.response?.data?.error) {
+        // Backend returned a specific error message
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        // Use the error message if available
+        errorMessage = error.message;
+      }
+      
       // Add error message to chat
       setMessages((prev) => [
         ...prev,
         {
           role: "error",
-          content:
-            "Sorry, there was an error processing your request. Please try again.",
+          content: errorMessage,
           timestamp: new Date(),
         },
       ]);
@@ -264,7 +273,7 @@ const Chat = () => {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask about a medication... (e.g., 'Tell me about Xarelto')"
+                  placeholder="Enter medication name (e.g., Xarelto)"
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                   rows="1"
                   style={{
