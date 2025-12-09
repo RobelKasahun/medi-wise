@@ -37,11 +37,19 @@ client = OpenAI(api_key=openai_api_key)
 
 prompt_blueprint = Blueprint('prompt', __name__)
 
-@prompt_blueprint.route('/prompt', methods=['GET', 'POST'])
-@jwt_required()
+@prompt_blueprint.route('/prompt', methods=['GET', 'POST', 'OPTIONS'])
+@jwt_required(optional=True)
 def prompt():
+    # Handle OPTIONS request for CORS preflight
+    if request.method == 'OPTIONS':
+        return jsonify({}), 200
+    
     try:
         logged_in_user = str(get_jwt_identity())
+        
+        # Ensure user is authenticated for actual requests
+        if not logged_in_user:
+            return jsonify({'error': 'Authentication required'}), 401
         
         data = request.get_json()
         user_prompt = data.get('user_prompt')
@@ -53,17 +61,41 @@ def prompt():
                 'error': 'OpenAI API key not configured. Please add your API key to backend/.env file.'
             }), 500
         
-        url = f'https://api.fda.gov/drug/label.json?search=openfda.brand_name:{user_prompt.lower()}&limit=1'
+        # Try multiple search strategies for better medication matching
+        search_terms = [
+            f'openfda.brand_name:"{user_prompt.lower()}"',
+            f'openfda.generic_name:"{user_prompt.lower()}"',
+            f'openfda.brand_name:{user_prompt.lower()}',
+            f'openfda.generic_name:{user_prompt.lower()}'
+        ]
         
-        response = requests.get(url=url)
+        response = None
+        for search_term in search_terms:
+            url = f'https://api.fda.gov/drug/label.json?search={search_term}&limit=1'
+            try:
+                temp_response = requests.get(url=url)
+                if temp_response.status_code == 200 and temp_response.json().get('results'):
+                    response = temp_response
+                    break
+            except:
+                continue
         
-        if response.status_code != 200:
-            return jsonify({'error': f"Medication information for '{user_prompt}' not found"}), 404
+        if not response or response.status_code != 200:
+            return jsonify({'error': f"Medication information for '{user_prompt}' not found. Please check the spelling or try the generic name."}), 404
+        
+        # Check if we actually got results
+        response_data = response.json()
+        if not response_data.get('results'):
+            return jsonify({'error': f"Medication information for '{user_prompt}' not found. Please check the spelling or try the generic name."}), 404
         
         result = ''
-        for data in response.json()['results']:
+        for data in response_data['results']:
             flat = [item for sublist in data.values() for item in sublist]  # flatten nested list
             result += " ".join(flat)
+        
+        # Check if we got any meaningful data
+        if not result or len(result.strip()) < 50:
+            return jsonify({'error': f"Insufficient medication information found for '{user_prompt}'. The FDA database may not have detailed information for this medication."}), 404
             
         soup = BeautifulSoup(result, "html.parser")
         clean_text = soup.get_text(separator="\n", strip=True)
@@ -102,7 +134,13 @@ def prompt():
         #     )
             
         question = user_prompt.lower()
-        relevant_chunks = query_documents(question)
+        # Only query the current medication file, not all files
+        relevant_chunks = query_documents(question, file_path)
+        
+        # Validate we have enough context
+        if not relevant_chunks or len("\n\n".join(relevant_chunks).strip()) < 50:
+            return jsonify({'error': f"Unable to generate response. Insufficient medication data retrieved from FDA."}), 500
+        
         answer = generate_response(question, relevant_chunks)
         
         # Create or get conversation
@@ -185,19 +223,22 @@ def get_openai_embedding(text):
 
 
 # Function to query documents
-def query_documents(question, n_results=2):
-    # Temporary implementation without ChromaDB
-    # This will return all chunks from the files directory
-    files_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'files')
-    documents = load_documents_from_directory(files_dir)
+def query_documents(question, file_path, n_results=5):
+    # Read only the specific medication file
+    if not os.path.exists(file_path):
+        return []
     
-    all_chunks = []
-    for doc in documents:
-        chunks = split_text(doc["text"])
-        all_chunks.extend(chunks[:n_results])  # Take first n_results chunks from each doc
+    with open(file_path, 'r', encoding='utf-8') as file:
+        text = file.read()
     
-    print("==== Returning relevant chunks ====")
-    return all_chunks[:n_results] if all_chunks else []
+    if not text or len(text.strip()) < 50:
+        return []
+    
+    # Split into chunks and return the most relevant ones
+    chunks = split_text(text, chunk_size=2000, chunk_overlap=200)
+    
+    print(f"==== Returning {min(n_results, len(chunks))} relevant chunks ====")
+    return chunks[:n_results] if chunks else []
 
 
 # Function to generate a response from OpenAI
