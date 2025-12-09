@@ -93,13 +93,6 @@ def prompt():
         for doc in chunked_documents:
             print("==== Generating embeddings... ====")
             doc["embedding"] = get_openai_embedding(doc["text"])
-
-        # Upsert documents with embeddings into Chroma
-        # for doc in chunked_documents:
-        #     print("==== Inserting chunks into db;;; ====")
-        #     collection.upsert(
-        #         ids=[doc["id"]], documents=[doc["text"]], embeddings=[doc["embedding"]]
-        #     )
             
         question = user_prompt.lower()
         relevant_chunks = query_documents(question)
