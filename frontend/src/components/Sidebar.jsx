@@ -97,15 +97,14 @@ const Sidebar = ({
           ) : (
             <div className="p-2">
               {conversations.map((conv) => (
-                <button
+                <div
                   key={conv.id}
                   onClick={() => onSelectConversation(conv.id)}
-                  className={`w-full text-left p-3 rounded-lg mb-1 transition-colors group relative ${
+                  className={`w-full text-left p-3 rounded-lg mb-1 transition-colors group relative cursor-pointer ${
                     currentConversationId === conv.id
                       ? "bg-gray-700"
                       : "hover:bg-gray-800"
-                  }`}
-                  disabled={deletingId === conv.id}
+                  } ${deletingId === conv.id ? "opacity-50 pointer-events-none" : ""}`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
@@ -163,7 +162,7 @@ const Sidebar = ({
                       )}
                     </button>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           )}

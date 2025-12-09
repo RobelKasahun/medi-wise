@@ -18,8 +18,7 @@ export const AuthProvider = ({ children }) => {
 
   // Check if user is authenticated on mount
   useEffect(() => {
-    // Skip auth check on mount - user must login
-    setLoading(false);
+    checkAuth();
   }, []);
 
   const checkAuth = async () => {
